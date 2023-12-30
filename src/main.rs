@@ -1,8 +1,7 @@
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
-use std::{fmt, io};
 use std::collections::HashMap;
-
+use std::{fmt, io};
 
 #[derive(Debug, FromPrimitive, Eq, PartialEq, Hash)]
 enum Gem {
@@ -31,19 +30,10 @@ fn play_game(map: &mut [[u8; 5]; 5]) -> Vec<Gem> {
     let row_count = map.len();
     let col_count = map[0].len();
     let field_count = row_count * col_count;
-
-    let mut hidden_gem_count = 0;
-    for row in *map {
-        println!("{row:?}");
-        for col in row {
-            if col != 0 {
-                hidden_gem_count += 1;
-            }
-        }
-    }
+    let hidden_gem_count = count_gems(map);
     println!("{hidden_gem_count} gems hidden in {field_count} fields");
 
-    println!("Input search position by X,Y coordinates, e.g.: 3 4:");
+    println!("Input search position by coordinates: 0..{row_count} 0..{col_count}");
     let mut found_gems: Vec<Gem> = Vec::new();
     let mut attempt_count = 0;
 
@@ -64,7 +54,7 @@ fn play_game(map: &mut [[u8; 5]; 5]) -> Vec<Gem> {
             }
         };
         if x as usize >= row_count || y as usize >= col_count {
-            println!("Error parsing number! - Enter two space separated numbers: 0..{row_count} 0..{col_count}");
+            println!("Invalid coordinates! - Enter two space separated numbers: 0..{row_count} 0..{col_count}");
             continue;
         }
         attempt_count += 1;
@@ -81,6 +71,20 @@ fn play_game(map: &mut [[u8; 5]; 5]) -> Vec<Gem> {
         println!("{attempt_count}. Gem found at position {x} {y}. In your bag are: {found_gems:?} - {} remaining gems to find!", hidden_gem_count - found_gems.len())
     }
     found_gems
+}
+
+fn count_gems(map: &mut [[u8; 5]; 5]) -> usize {
+    // count hidden gems
+    let mut hidden_gem_count = 0;
+    for row in *map {
+        println!("{row:?}");
+        for col in row {
+            if col != 0 {
+                hidden_gem_count += 1;
+            }
+        }
+    }
+    hidden_gem_count
 }
 
 fn main() {
